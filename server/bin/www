@@ -7,8 +7,9 @@
 var config = require('../config/config');
 var db = require('../db');
 var app = require('../app');
-var debug = require('debug')('server:server');
 var http = require('http');
+var setupService = require('../services/setup-service');
+
 
 /**
  * Get port from environment and store in Express.
@@ -32,9 +33,16 @@ db.connect(config.mongodb, function (err, connection) {
         console.error('Cannot connect to DDLeye MongoDB. Check ../config/config.js file and try again.');
         console.error(err);
     } else {
-        server.listen(port);
-        server.on('error', onError);
-        server.on('listening', onListening);
+        setupService.configure(function (err) {
+            if (err) {
+               console.error('Cannot verify DLLeye configuration. Check your MongoDB server and try again.');
+               console.error(err); 
+            } else {
+                server.listen(port);
+                server.on('error', onError);
+                server.on('listening', onListening);    
+            }
+        });
     }
 });
 

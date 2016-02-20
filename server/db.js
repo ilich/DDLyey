@@ -8,12 +8,12 @@ module.exports = {
             return done(null, connection);
         }
         
-        MongoClient.connect(connectionString, function (err, res) {
+        MongoClient.connect(connectionString, function (err, db) {
             if (err) {
                 return done(err);
             }
             
-            connection = res;
+            connection = db;
             done(null, connection);
         });
     },

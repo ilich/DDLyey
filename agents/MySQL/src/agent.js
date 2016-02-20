@@ -1,5 +1,5 @@
-var util = require('util'),
-    mysql = require('mysql');
+var util = require('util');
+var mysql = require('mysql');
 
 var DB_OBJECT = {
     TABLES: 0,

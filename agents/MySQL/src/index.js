@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-var commander = require('commander'),
-    program = new commander.Command('ddleye-mysql'),
-    MySqlAgent = require('./agent');
+var commander = require('commander');
+var program = new commander.Command('ddleye-mysql');
+var MySqlAgent = require('./agent');
 
 function isValid(program) {
     if (!program.server) {
