@@ -1,0 +1,19 @@
+{
+  "name": "ddleye-mysql",
+  "version": "0.0.1",
+  "description": "DDLeye Agent for MySQL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ilya Verbitskiy",
+  "license": "MIT",
+  "private": true,
+  "bin": {
+    "ddleye-mysql": "./index.js"  
+  },
+  "dependencies": {
+    "commander": "^2.9.0",
+    "node-mysql": "^0.4.2"
+  }
+}
