@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-var program = require('commander'),
+var commander = require('commander'),
+    program = new commander.Command('ddleye-mysql'),
     MySqlAgent = require('./agent');
 
 function isValid(program) {
@@ -47,6 +48,9 @@ function main() {
         process.exit(1);
     }
     
+    console.log('\n');
+    console.log('Started');
+    
     var agent = new MySqlAgent(
         program.server, 
         program.database, 
@@ -54,8 +58,15 @@ function main() {
         program.password,
         program.id,
         program.secret);
-        
-    agent.sync();
+    
+    agent.sync(function (err) {
+        if (err) {
+            console.log(' error: %s\n', err);
+            process.exit(1);
+        } else {
+            console.log('DONE!');
+        }
+    });
 }
 
 main();
