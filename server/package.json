@@ -14,6 +14,7 @@
     "ejs": "~2.3.3",
     "express": "~4.13.1",
     "express-session": "^1.13.0",
+    "hat": "0.0.3",
     "mongodb": "^2.1.7",
     "morgan": "~1.6.1",
     "passport": "^0.3.2",
