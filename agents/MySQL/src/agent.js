@@ -95,7 +95,8 @@ MySqlAgent.prototype.sync = function (done) {
                             type: mongoObjectType,
                             name: mysqlData.OBJECT_NAME,
                             text: mysqlData.TEXT,
-                            checksum: mysqlData.CHECKSUM
+                            checksum: mysqlData.CHECKSUM,
+                            lastModified: new Date()
                         }, function (err) {
                             console.log('Indexed %s (%s)', mysqlData.OBJECT_NAME, mongoObjectType);
                             

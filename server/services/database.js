@@ -226,6 +226,7 @@ module.exports = {
                                 type: object.type,
                                 text: object.text,
                                 checksum: object.checksum,
+                                lastModified: new Date(),
                                 modified: new Date()
                             }    
                         }, function (err) {
@@ -239,7 +240,7 @@ module.exports = {
                         // Add object to the database metadata list
                         
                         object.database = database._id;
-                        object.created = new Date();
+                        object.lastModified = new Date();
                         
                         metadata.insertOne(object, function (err, r) {
                             if (err) {

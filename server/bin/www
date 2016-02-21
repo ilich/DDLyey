@@ -35,8 +35,9 @@ db.connect(config.mongodb, function (err, connection) {
     } else {
         setupService.configure(function (err) {
             if (err) {
-               console.error('Cannot verify DLLeye configuration. Check your MongoDB server and try again.');
-               console.error(err); 
+                db.close();
+                console.error('Cannot verify DLLeye configuration. Check your MongoDB server and try again.');
+                console.error(err); 
             } else {
                 server.listen(port);
                 server.on('error', onError);
