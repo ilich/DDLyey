@@ -12,6 +12,7 @@ var passport = require('passport');
 var configPassport = require('./middleware/passport');
 var commonData = require('./middleware/common-data');
 
+var api = require('./routes/api');
 var database = require('./routes/database');
 var login = require('./routes/login');
 var account = require('./routes/account');
@@ -52,6 +53,8 @@ app.use(passport.session());
 app.use(passport.authenticate('remember-me'));
 
 // API - no CSURF
+
+app.use('/api', api('v1.0'));
 
 // Web UI - CSURF required
 

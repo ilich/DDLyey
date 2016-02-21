@@ -79,7 +79,7 @@ router.post('/create-database', protectWeb, function (req, res, next) {
     }
 });
 
-router.get('/:database', function (req, res, next) {
+router.get('/:database', protectWeb, function (req, res, next) {
     var dbId = req.params.database;
     databaseService.findDatabaseById(dbId, function (err, database) {
         if (err || !database) {

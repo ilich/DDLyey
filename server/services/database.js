@@ -1,5 +1,6 @@
 var crypto = require('crypto');
 var strftime = require('strftime');
+var async = require('async');
 var ObjectID = require('mongodb').ObjectID;
 var db = require('../db');
 var config = require('../config/config');
@@ -7,6 +8,10 @@ var config = require('../config/config');
 function calculateSha1Hmac(text, key) {
     var hash = crypto.createHmac('sha1', key).update(text).digest('hex');
     return hash;
+}
+
+function validateDatabaseObjectType(type) {
+    return type === 'table' || type === 'view' || type === 'procedure' || type === 'function';
 }
 
 module.exports = {
@@ -71,7 +76,7 @@ module.exports = {
             return callback(null, data);
         });
     },
-
+    
     createDatabase: function (database, callback) {
         database.created = new Date();
 
@@ -81,7 +86,7 @@ module.exports = {
                 return callback(err);
             }
             
-            if (r == null) {
+            if (!r) {
                 return callback(null, null);
             }
             
@@ -97,5 +102,130 @@ module.exports = {
                 }
             });
         });
-    }
+    },
+    
+    getObjects: function (databaseId, type, callback) {
+        if (typeof type === 'function') {
+            callback = type;
+            type = null;
+        }
+        
+        this.findDatabaseById(databaseId, function (err, database) {
+            if (err) {
+                return callback(err);
+            }
+            
+            if (!database) {
+                return callback(null, null);
+            }
+            
+            var metadata = db.get().collection('metadata');
+            var query = {
+                database: database._id,
+            };
+            
+            if (type != null) {
+                query.type = type;    
+            }
+            
+            var objects = [];
+            var stream = metadata.find(query).stream();
+            
+            stream.on('end', function () {
+                return callback(null, objects);
+            });
+            
+            stream.on('data', function (data) {
+                objects.push(data);
+            });
+        });
+    },
+    
+    removeObjects: function (databaseId, objectIds, callback) {
+        this.findDatabaseById(databaseId, function (err, database) {
+            if (err) {
+                return callback(err);
+            }
+            
+            if (!database) {
+                return callback(null, null);
+            }
+            
+            var metadata = db.get().collection('metadata');
+            async.each(objectIds, function (objectId, removed) {
+                metadata.deleteOne({_id: new ObjectID(objectId)}, function (err) {
+                    if (err) {
+                        return removed(err);
+                    } else {
+                        return removed();
+                    }
+                })
+            }, callback);
+        });
+    },
+    
+    // Working with database metadata
+    createOrUpdateObject: function (databaseId, object, callback) {
+        // Validate type and checksum
+        // TODO
+        
+        // Find if target databse exists
+        this.findDatabaseById(databaseId, function (err, database) {
+            if (err) {
+                return callback(err);
+            }
+            
+            if (!database) {
+                return callback(null, null);
+            }
+            
+            var metadata = db.get().collection('metadata');
+            metadata.findOne({
+                    database: database._id, 
+                    name: object.name, 
+                    type: object.type
+                }, 
+                function (err, objectInfo) {
+                    if (err) {
+                        return callback(err);
+                    }
+                    
+                    if (objectInfo) {
+                        // Update metadata object
+                        metadata.update(objectInfo, {
+                            $set: {
+                                type: object.type,
+                                text: object.text,
+                                checksum: object.checksum,
+                                modified: new Date()
+                            }    
+                        }, function (err) {
+                            if (err) {
+                                return callback(err);
+                            } else {
+                                return callback(null, objectInfo._id);
+                            }   
+                        });
+                    } else {
+                        // Add object to the database metadata list
+                        object.database = database._id;
+                        object.created = new Date();
+                        
+                        metadata.insertOne(object, function (err, r) {
+                            if (err) {
+                                return callback(err);
+                            }
+                            
+                            if (!r) {
+                                return callback(null, null);
+                            }
+                            
+                            objectInfo = r.ops[0];
+                            return callback(null, objectInfo._id);
+                        });
+                    }
+                }
+            );
+        });  
+    },
 };
