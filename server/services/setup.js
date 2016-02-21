@@ -26,17 +26,23 @@ module.exports = {
             if (!isConfigured) {
                 // Create default user (demo/demo) and continue
                 var users = db.get().collection('users');
-                users.insert({
-                    username: config.default.username,
-                    password: bcrypt.hashSync(config.default.password),
-                    email: config.default.email,
-                    created: new Date() 
-                }, function (err, result) {
+                users.createIndex({username: 1}, function (err, result) {
                     if (err) {
                         return next(err);
                     }
                     
-                    next();
+                    users.insert({
+                        username: config.default.username,
+                        password: bcrypt.hashSync(config.default.password),
+                        email: config.default.email,
+                        created: new Date() 
+                    }, function (err, result) {
+                        if (err) {
+                            return next(err);
+                        }
+                        
+                        next();
+                    });
                 });
             } else {
                 return next();
