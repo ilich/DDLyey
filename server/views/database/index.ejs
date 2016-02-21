@@ -1,5 +1,37 @@
 <% include ../shared/header.ejs %>
 
-Hello World!
+<div class="row">
+    <div class="col-md-6">
+        <h3>Databases</h3>
+    </div>
+</div>
+<div class="row">
+    <% if (databases.length == 0) { %>
+        <div class="col-md-6">
+            <div class="alert alert-info" role="alert">You haven't registered any database yet.</div>
+        </div>
+    <% } else { %>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Database</th>
+                    <th>Database Engine</th>
+                    <th>Notes</th>
+                    <th>Created</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (var i = 0; i < databases.length; i++) { %>
+                    <tr>
+                        <td><a href="/<%= databases[i]._id %>"><%= databases[i].database %></a></td>
+                        <td><%= databases[i].engineName %></td>
+                        <td><%= databases[i].notes %></td>
+                        <td><%= databases[i].time %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    <% } %>
+</div>
 
 <% include ../shared/footer.ejs %>

@@ -4,8 +4,12 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/', protectWeb, function(req, res, next) {
-    // TODO
-    res.render('database/index');
+    databaseService.getDatabases(function (databases) {
+        res.render('database/index', {
+            databases: databases
+        });         
+    });
+    
 });
 
 router.get('/create-database', protectWeb, function (req, res, next) {
@@ -73,7 +77,10 @@ router.post('/create-database', protectWeb, function (req, res, next) {
             }
         });
     }
-    
+});
+
+router.get('/:database', function (req, res, next) {
+    res.end(req.params.database);    
 });
 
 module.exports = router;

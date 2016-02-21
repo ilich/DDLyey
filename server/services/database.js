@@ -1,4 +1,5 @@
 var crypto = require('crypto');
+var strftime = require('strftime');
 var db = require('../db');
 var config = require('../config/config');
 
@@ -21,6 +22,26 @@ module.exports = {
 
     isValidEngine: function (engine) {
         return this.engineName(engine) !== null;
+    },
+    
+    getDatabases: function (callback) {
+        var self = this;
+        var results = [];
+        
+        var databases = db.get().collection('databases');
+        var stream = databases.find().sort({'database': 1}).stream();
+        
+        stream.on('end', function () {
+            callback(results);
+        });
+        
+        stream.on('data', function (data) {
+            if (data !== null) {
+                data.time = strftime('%F %T', data.created);
+                data.engineName = self.engineName(data.engine);
+                results.push(data);
+            }
+        });
     },
 
     createDatabase: function (database, callback) {
