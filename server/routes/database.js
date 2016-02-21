@@ -73,14 +73,25 @@ router.post('/create-database', protectWeb, function (req, res, next) {
                     notes: notes
                 });     
             } else {
-                return res.redirect('/');
+                return res.redirect('/' + db._id);
             }
         });
     }
 });
 
 router.get('/:database', function (req, res, next) {
-    res.end(req.params.database);    
+    var dbId = req.params.database;
+    databaseService.findDatabaseById(dbId, function (err, database) {
+        if (err || !database) {
+            // Forward request to 404 handler (see app.js)
+            return next();
+        }
+        
+        return res.render('database/view', {
+            db: database,
+            scripts: ['/js/view-database.js']
+        });
+    })
 });
 
 module.exports = router;

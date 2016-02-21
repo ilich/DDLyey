@@ -1,0 +1,34 @@
+<% include ../shared/header.ejs %>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3><%= db.database %></h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <dl>
+            <dt>Database engine</dt>
+            <dd><%= db.engineName %></dd>
+        </dl>
+        <dl>
+            <dt>API Key</dt>
+            <dd><%= db._id %></dd>
+        </dl>
+        <dl>
+            <dt>API Secret</dt>
+            <dd><a href="#" data-value="<%= db.secret %>" id="api-secret">Show API Secret</a></dd>
+        </dl>
+        <dl>
+            <dt>Created</dt>
+            <dd><%= db.time %></dd>
+        </dl>
+        <dl>
+            <dt>Last Modified</dt>
+            <dd><%= db.timeModified %></dd>
+        </dl>
+    </div>
+</div>
+
+<% include ../shared/footer.ejs %>

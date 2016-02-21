@@ -1,5 +1,6 @@
 var crypto = require('crypto');
 var strftime = require('strftime');
+var ObjectID = require('mongodb').ObjectID;
 var db = require('../db');
 var config = require('../config/config');
 
@@ -41,6 +42,33 @@ module.exports = {
                 data.engineName = self.engineName(data.engine);
                 results.push(data);
             }
+        });
+    },
+    
+    findDatabaseById: function (id, callback) {
+        var self = this;
+        var objectId;
+        
+        try {
+            objectId = new ObjectID(id);  
+        } catch (err) {
+             return callback(err);
+        }
+        
+        var databases = db.get().collection('databases');
+        databases.findOne(objectId, function (err, data) {
+            if (err) {
+                return callback(err);
+            }
+            
+            if (!data) {
+                return callback(null, null);
+            }
+            
+            data.time = strftime('%F %T', data.created);
+            data.timeModified = data.modified ? strftime('%F %T', data.modified) : 'Not yet';
+            data.engineName = self.engineName(data.engine);
+            return callback(null, data);
         });
     },
 

@@ -37,6 +37,12 @@
                         </a>
                         <ul class="dropdown-menu">
                             <li><a href="/create-database">New Database</a></li>
+                            <% if (databaseList.length > 0) { %>
+                                <li role="separator" class="divider"></li>
+                                <% for (var i = 0; i < databaseList.length; i++) { %>
+                                    <li><a href="/<%= databaseList[i].id %>"><%= databaseList[i].name %></a></li>
+                                <% } %>
+                            <% } %>
                         </ul>
                     </li>
                     <li class="dropdown">

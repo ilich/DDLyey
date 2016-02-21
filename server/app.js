@@ -10,6 +10,7 @@ var helmet = require('helmet');
 var csrf = require('csurf');
 var passport = require('passport');
 var configPassport = require('./middleware/passport');
+var commonData = require('./middleware/common-data');
 
 var database = require('./routes/database');
 var login = require('./routes/login');
@@ -55,10 +56,11 @@ app.use(passport.authenticate('remember-me'));
 // Web UI - CSURF required
 
 app.use(csrf());
+app.use(commonData);
 
-app.use('/', database);
 app.use('/login', login);
 app.use('/account', account);
+app.use('/', database);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
