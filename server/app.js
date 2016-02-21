@@ -42,6 +42,7 @@ app.use(flash());
 configPassport(passport);
 app.use(passport.initialize());
 app.use(passport.session());
+//app.use(passport.authenticate('remember-me'));
 
 app.use('/', routes);
 app.use('/login', login);

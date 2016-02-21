@@ -1,10 +1,9 @@
 var bcrypt = require('bcrypt-nodejs');
-var storage = require('../db');
+var db = require('../db');
 var config = require('../config/config');
 
 function isConfigured(next) {
-    var db = storage.get();
-    db.listCollections({name: 'users'}).toArray(function (err, items) {
+    db.get().listCollections({name: 'users'}).toArray(function (err, items) {
         if (err) {
             return next(err);
         }
@@ -26,11 +25,11 @@ module.exports = {
             
             if (!isConfigured) {
                 // Create default user (demo/demo) and continue
-                var db = storage.get();
-                var users = db.collection('users');
+                var users = db.get().collection('users');
                 users.insert({
                     username: config.default.username,
                     password: bcrypt.hashSync(config.default.password),
+                    email: config.default.email,
                     created: new Date() 
                 }, function (err, result) {
                     if (err) {

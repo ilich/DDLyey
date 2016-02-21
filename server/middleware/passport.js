@@ -1,7 +1,6 @@
 var db = require('../db');
-var ObjectID = require('mongodb').ObjectID;
 var LocalStrategy = require('passport-local').Strategy;
-var bcrypt = require('bcrypt-nodejs');
+var usersService = require('../services/users');
 
 module.exports = function (passport) {
     var INVALID_LOGIN = 'Incorrect username or password.';
@@ -11,8 +10,7 @@ module.exports = function (passport) {
     });
     
     passport.deserializeUser(function (id, done) {
-        var users = db.get().collection('users');
-        users.findOne(new ObjectID(id), function (err, user) {
+        usersService.findUserById(id, function (err, user) {
             if (err) {
                 return done(err);
             } else if (user === null) {
@@ -20,7 +18,7 @@ module.exports = function (passport) {
             } else {
                 return done(null, user);
             }
-        });  
+        });
     });
     
     passport.use(new LocalStrategy({
@@ -29,29 +27,15 @@ module.exports = function (passport) {
         passReqToCallback: true
     }, function (req, username, password, done) {
         process.nextTick(function () {
-            var users = db.get().collection('users');
-            users.findOne({ username: username }, function (err, user) {
+            usersService.login(username, password, function (err, user) {
                 if (err) {
                     return done(err);
-                }
-                
-                if (user === null) {
+                } else if (user === null) {
                     req.flash('username', username);
                     return done(null, false, { message: INVALID_LOGIN });
+                } else {
+                    return done(null, user);
                 }
-                
-                bcrypt.compare(password, user.password, function (err, result) {
-                    if (err) {
-                        return done(err);
-                    }
-                    
-                    if (result === true) {
-                        return done(null, user);
-                    } else {
-                        req.flash('username', username);
-                        return done(null, false, { message: INVALID_LOGIN });
-                    }
-                });
             });
         });
     }));

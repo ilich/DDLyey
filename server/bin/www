@@ -8,7 +8,7 @@ var config = require('../config/config');
 var db = require('../db');
 var app = require('../app');
 var http = require('http');
-var setupService = require('../services/setup-service');
+var setupService = require('../services/setup');
 
 
 /**
