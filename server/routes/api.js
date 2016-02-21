@@ -3,8 +3,6 @@ var databaseService = require('../services/database');
 var protectApi = require('../middleware/protect-api');
 var express = require('express');
 
-// TODO SECURITY !!!!!
-
 function createApiRouter(version) {
     var router = express.Router();
     var uri = util.format('/%s/:database', version);
