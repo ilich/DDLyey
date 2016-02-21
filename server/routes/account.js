@@ -10,7 +10,7 @@ router.get('/logout', protectWeb, function (req, res, next) {
 });
 
 router.get('/change-password', protectWeb, function (req, res, next) {
-    
+        
 });
 
 module.exports = router;

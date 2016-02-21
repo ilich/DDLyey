@@ -13,6 +13,7 @@ router.get('/', function (req, res, next) {
     var errors = req.flash('error');
     
     res.render('login/login', {
+        csrfToken: req.csrfToken(),
         errors: errors,
         username: username.length > 0 ? username[0] : '' 
     });

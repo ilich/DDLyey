@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 var session = require('express-session');
 var flash = require('connect-flash');
 var helmet = require('helmet');
+var csrf = require('csurf');
 var passport = require('passport');
 var configPassport = require('./middleware/passport');
 
@@ -49,6 +50,12 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(passport.authenticate('remember-me'));
 
+// API - no CSURF
+
+// Web UI - CSURF required
+
+app.use(csrf());
+
 app.use('/', routes);
 app.use('/login', login);
 app.use('/account', account);
@@ -66,6 +73,11 @@ app.use(function(req, res, next) {
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
+    if (err.code === 'EBADCSRFTOKEN') {
+      res.status(403);
+      return res.send('access denied');    
+    }
+    
     res.status(err.status || 500);
     res.render('error', {
       message: err.message,
@@ -77,6 +89,11 @@ if (app.get('env') === 'development') {
 // production error handler
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
+  if (err.code === 'EBADCSRFTOKEN') {
+    res.status(403);
+    return res.send('access denied');    
+  }
+  
   res.status(err.status || 500);
   res.render('error', {
     message: err.message,
