@@ -19,6 +19,45 @@ module.exports = {
         });       
     },
     
+    changePassword: function (userId, password, newPassword, callback) {
+        var users = db.get().collection('users');
+        users.findOne(new ObjectID(userId), function (err, user) {
+            if (err) {
+                return callback(false);
+            }
+            
+            if (user === null) {
+                return callback(false);
+            }
+            
+            bcrypt.compare(password, user.password, function (err, result) {
+                if (err) {
+                    return callback(false);
+                }
+                
+                if (!result) {
+                    return callback(false);
+                }
+                
+                bcrypt.hash(newPassword, null, null, function (err, hash) {
+                    if (err) {
+                        return callback(false);
+                    }
+                    
+                    users.updateOne(user, {
+                        $set: {password: hash, modified: new Date()}
+                    }, function (err) {
+                        if (err) {
+                            return callback(false);
+                        } else {
+                            return callback(true);
+                        }
+                    });
+                });
+            });
+        });
+    },
+    
     login: function (username, password, callback) {
         var users = db.get().collection('users');
         users.findOne({ username: username }, function (err, user) {
@@ -36,7 +75,15 @@ module.exports = {
                 }
                 
                 if (result === true) {
-                    return callback(null, user);
+                    users.update(user, {
+                        $set: {lastAccess: new Date()}
+                    }, function (err) {
+                        if (err) {
+                            return callback(null, null);
+                        } else {
+                            return callback(null, user);    
+                        }
+                    });
                 } else {
                     return callback(null, null);
                 }
