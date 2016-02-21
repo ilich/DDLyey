@@ -11,7 +11,7 @@ var csrf = require('csurf');
 var passport = require('passport');
 var configPassport = require('./middleware/passport');
 
-var routes = require('./routes/index');
+var database = require('./routes/database');
 var login = require('./routes/login');
 var account = require('./routes/account');
 
@@ -56,7 +56,7 @@ app.use(passport.authenticate('remember-me'));
 
 app.use(csrf());
 
-app.use('/', routes);
+app.use('/', database);
 app.use('/login', login);
 app.use('/account', account);
 
