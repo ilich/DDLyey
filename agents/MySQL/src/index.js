@@ -25,8 +25,8 @@ function isValid(program) {
         return false;
     }
     
-    if (!program.secret) {
-        console.error('\n error: --secret is required\n');
+    if (!program.mongodb) {
+        console.error('\n error: --mongodb is required\n');
         return false;
     }
     
@@ -41,7 +41,7 @@ function main() {
         .option('-u, --user [user]', 'MySQL user')
         .option('-p, --password [password]', 'MySQL password')
         .option('-i, --id [id]', 'DDLeye API database ID')
-        .option('-k, --secret [secret]', 'DDLeye API database secret key')
+        .option('-m, --mongodb [mongodb]', 'MongoDB connection string')
         .parse(process.argv);
         
     if (!isValid(program)) {
@@ -57,7 +57,7 @@ function main() {
         program.user, 
         program.password,
         program.id,
-        program.secret);
+        program.mongodb);
     
     agent.sync(function (err) {
         if (err) {

@@ -1,6 +1,8 @@
 var util = require('util');
 var mysql = require('mysql');
-var request = require('request-promise');
+var async = require('async');
+var MongoClient = require('mongodb').MongoClient;
+var ObjectID = require('mongodb').ObjectID;
 var auth = require('./auth');
 
 var DB_OBJECT = {
@@ -10,16 +12,17 @@ var DB_OBJECT = {
     FUNCTIONS: 3
 };
 
-function MySqlAgent(server, database, user, password, apiId, apiSecret) {
+function MySqlAgent(server, database, user, password, apiId, mongo) {
     console.log('===========================================');
     console.log('MySQL Host: %s', server);
     console.log('Target Database: %s', database);
     console.log('User: %s', user);
     console.log('DDLeye API: %s', apiId);
+    console.log('MongoDB: %s', mongo);
     console.log('===========================================');
     
     this.apiId = apiId;
-    this.apiSecret = apiSecret;
+    this.mongo = mongo;
     this.schema = database;
     this.connection = mysql.createConnection({
         host: server,
@@ -34,65 +37,111 @@ MySqlAgent.prototype.sync = function (done) {
     }
     
     var self = this;
-    
-    self.connection.connect(function (err) {
+    MongoClient.connect(self.mongo, function (err, db) {
         if (err) {
-            return done(err)
+            return done(err);
         }
         
-        console.log('Connected to MySQL');        
-    });
-    
-    function syncObjects(objectType) {
-        var sql = null;
-        switch(objectType) {
-            case DB_OBJECT.TABLES:
-                sql = 'CALL DDLeye.GetTables(?);';
-                break;
-                
-            case DB_OBJECT.VIEWS:
-                sql = 'CALL DDLeye.GetViews(?);';
-                break;
-                
-            case DB_OBJECT.PROCEDURES:
-                sql = 'CALL DDLeye.GetProcedures(?)';
-                break;
-                
-            case DB_OBJECT.FUNCTIONS:
-                sql = 'CALL DDLeye.GetFunctions(?)';
-                break;
-        }
+        console.log('Connected to MongoDB');
         
-        if (!sql) {
-            throw new TypeError('Invalid MySQL object type');
-        }
+        var metadata = db.collection('metadata');
         
-        return new Promise(function (resolve, reject) {
-            self.connection.query(sql, [ self.schema ], function (err, result) {
-                if (err) {
-                    return reject(err);
-                }
-                
-                // TODO
-                
-                console.log(result[0]);
-                resolve();    
+        self.connection.connect(function (err) {
+            if (err) {
+                return done(err)
+            }
+            
+            console.log('Connected to MySQL');        
+        });
+        
+        function syncObjects(objectType) {
+            var sql = null;
+            var mongoObjectType = null;
+            switch(objectType) {
+                case DB_OBJECT.TABLES:
+                    sql = 'CALL DDLeye.GetTables(?);';
+                    mongoObjectType = 'table';
+                    break;
+                    
+                case DB_OBJECT.VIEWS:
+                    sql = 'CALL DDLeye.GetViews(?);';
+                    mongoObjectType = 'view';
+                    break;
+                    
+                case DB_OBJECT.PROCEDURES:
+                    sql = 'CALL DDLeye.GetProcedures(?)';
+                    mongoObjectType = 'procedure';
+                    break;
+                    
+                case DB_OBJECT.FUNCTIONS:
+                    sql = 'CALL DDLeye.GetFunctions(?)';
+                    mongoObjectType = 'function';
+                    break;
+            }
+            
+            if (!sql) {
+                throw new TypeError('Invalid MySQL object type');
+            }
+            
+            return new Promise(function (resolve, reject) {
+                self.connection.query(sql, [ self.schema ], function (err, result) {
+                    if (err) {
+                        return reject(err);
+                    }
+                    
+                    async.each(result[0], function (mysqlData, callback) {
+                        metadata.insert({
+                            database: new ObjectID(self.Id),
+                            type: mongoObjectType,
+                            name: mysqlData.OBJECT_NAME,
+                            text: mysqlData.TEXT,
+                            checksum: mysqlData.CHECKSUM
+                        }, function (err) {
+                            console.log('Indexed %s (%s)', mysqlData.OBJECT_NAME, mongoObjectType);
+                            
+                            if (err) {
+                                return callback(err);
+                            } else {
+                                return callback();
+                            }
+                        });
+                    }, function (err, result) {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            resolve();
+                        }
+                    });
+                });
             });
+        }
+
+        metadata.deleteMany({database: new ObjectID(self.apiKey)}, function (err, r) {
+            if (err) {
+                return done(err);
+            }
+            
+            console.log('MongoDB metadata for %s has been cleaned up', self.apiKey);
+            
+            Promise.all([
+                syncObjects(DB_OBJECT.TABLES),
+                syncObjects(DB_OBJECT.VIEWS),
+                syncObjects(DB_OBJECT.PROCEDURES),
+                syncObjects(DB_OBJECT.FUNCTIONS)
+            ]).then(function () {
+                db.close(function () {
+                    console.log('Disconnected from MongoDB'); 
+                    
+                    self.connection.end(function () {
+                        console.log('Disconnected from MySQL'); 
+                        done();   
+                    });    
+                });
+                
+            }).catch(function (reason) {
+                done(reason);  
+            });    
         });
-    }
-    
-    Promise.all([
-        syncObjects(DB_OBJECT.TABLES),
-        syncObjects(DB_OBJECT.VIEWS),
-        syncObjects(DB_OBJECT.PROCEDURES),
-        syncObjects(DB_OBJECT.FUNCTIONS)
-    ]).then(function () {
-        self.connection.end(function () {
-            console.log('Disconnected from MySQL'); 
-            done();   
-        });
-    }).catch(function (reason) {
-        done(reason);  
     });
 };
 
