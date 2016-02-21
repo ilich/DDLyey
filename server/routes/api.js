@@ -11,7 +11,9 @@ function createApiRouter(version) {
     function createOrUpdateObject(req, res, next) {
         databaseService.createOrUpdateObject(req.params.database, req.body, function (err, objectId) {
             if (err || !objectId) {
-                return res.status(400).send('Bad Request');
+                return res.status(400).json({
+                    error: err || 'Operation failed'
+                });
             }
             
             return res.json({
@@ -24,7 +26,9 @@ function createApiRouter(version) {
         databaseService.removeObjects(req.params.database, req.body.objects, function (err) {
             console.log(err);
             if (err) {
-                return res.status(400).send('Bad Request');
+                return res.status(400).json({
+                    error: err || 'Operation failed'
+                });
             }
             
             return res.json({
@@ -36,7 +40,9 @@ function createApiRouter(version) {
     router.get(uri, function (req, res, next) {
         databaseService.getObjects(req.params.database, function (err, objects) {
             if (err || !objects) {
-                return res.status(400).send('Bad Request');
+                return res.status(400).json({
+                    error: err ? err.toString() : 'Operation failed'
+                });
             }
             
             var result = objects.map(function (obj) {

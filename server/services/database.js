@@ -14,6 +14,15 @@ function validateDatabaseObjectType(type) {
     return type === 'table' || type === 'view' || type === 'procedure' || type === 'function';
 }
 
+function validateChecksum(object) {
+    if (!object || !object.checksum || !object.text) {
+        return false;
+    }
+    
+    var hash = crypto.createHash('sha1').update(object.text).digest('hex');
+    return hash === object.checksum;
+}
+
 module.exports = {
     supportedDatabases: function () {
         return [
@@ -167,7 +176,26 @@ module.exports = {
     // Working with database metadata
     createOrUpdateObject: function (databaseId, object, callback) {
         // Validate type and checksum
-        // TODO
+        
+        if (!object) {
+            return callback('Object is not provided');
+        }
+        
+        if(object.type) {
+            object.type = object.type.toLowerCase();
+        }
+        
+        if(object.checksum) {
+            object.checksum = object.checksum.toLowerCase();
+        }
+        
+        if (!validateDatabaseObjectType(object.type)) {
+            return callback('Invalid object type');
+        }
+        
+        if (!validateChecksum(object)) {
+            return callback('Invalid checksum');
+        }
         
         // Find if target databse exists
         this.findDatabaseById(databaseId, function (err, database) {
@@ -192,6 +220,7 @@ module.exports = {
                     
                     if (objectInfo) {
                         // Update metadata object
+                        
                         metadata.update(objectInfo, {
                             $set: {
                                 type: object.type,
@@ -208,6 +237,7 @@ module.exports = {
                         });
                     } else {
                         // Add object to the database metadata list
+                        
                         object.database = database._id;
                         object.created = new Date();
                         
