@@ -1,5 +1,7 @@
 var util = require('util');
 var mysql = require('mysql');
+var request = require('request-promise');
+var auth = require('./auth');
 
 var DB_OBJECT = {
     TABLES: 0,
@@ -78,6 +80,11 @@ MySqlAgent.prototype.sync = function (done) {
             });
         });
     }
+    
+    // Step 1. Find existing objects in the index
+    var callKey = auth.getApiKey("GET /api/v1.0/56c9f778d44cd1d818e3ec3b", self.apiId, self.apiSecret);
+    console.log(callKey);
+    process.exit(1);
     
     Promise.all([
         syncObjects(DB_OBJECT.TABLES),

@@ -1,5 +1,6 @@
 module.exports = {
     applicationKey: 'w5unuS@e=aP_avAph_vaFreTHupaf!8a',
+    requestLifetime: 62,       // 2 minutes
     mongodb: 'mongodb://127.0.0.1/DDLeye',
     rememberMeCookie: {
         name: 'remember_me',

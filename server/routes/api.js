@@ -1,5 +1,6 @@
 var util = require('util');
 var databaseService = require('../services/database');
+var protectApi = require('../middleware/protect-api');
 var express = require('express');
 
 // TODO SECURITY !!!!!
@@ -37,7 +38,9 @@ function createApiRouter(version) {
         });
     }
     
-    router.get(uri, function (req, res, next) {
+    router.get(uri, protectApi, function (req, res, next) {
+        res.setHeader('Last-Modified', (new Date()).toUTCString());
+        
         databaseService.getObjects(req.params.database, function (err, objects) {
             if (err || !objects) {
                 return res.status(400).json({
@@ -60,7 +63,7 @@ function createApiRouter(version) {
         });
     });
     
-    router.post(uri, function (req, res, next) {
+    router.post(uri, protectApi, function (req, res, next) {
         if (req.body.action === 'bulk_delete') {
             return bulkDelete(req, res, next);
         } else {
@@ -69,7 +72,7 @@ function createApiRouter(version) {
             
     });
     
-    router.put(uri, function (req, res, next) {
+    router.put(uri, protectApi, function (req, res, next) {
         return createOrUpdateObject(req, res, next);  
     });
 

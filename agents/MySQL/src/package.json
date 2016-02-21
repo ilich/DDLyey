@@ -10,10 +10,12 @@
   "license": "MIT",
   "private": true,
   "bin": {
-    "ddleye-mysql": "./index.js"  
+    "ddleye-mysql": "./index.js"
   },
   "dependencies": {
     "commander": "^2.9.0",
-    "node-mysql": "^0.4.2"
+    "node-mysql": "^0.4.2",
+    "request-promise": "^2.0.1",
+    "strftime": "^0.9.2"
   }
 }
