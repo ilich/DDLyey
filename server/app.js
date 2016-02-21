@@ -6,6 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var flash = require('connect-flash');
+var helmet = require('helmet');
 var passport = require('passport');
 var configPassport = require('./middleware/passport');
 
@@ -26,9 +27,12 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use(helmet());
+
+app.set('trust proxy', 1) // trust first proxy
 app.use(session({
     secret: 'janEphEzEN8Cr8racU',
-    name: 'DDLeyeSID',
+    name: 'SessionId',
     resave: false,
     saveUninitialized: true,
     cookie: {
