@@ -12,7 +12,7 @@ router.get('/', function (req, res, next) {
     var username = req.flash('username');
     var errors = req.flash('error');
     
-    res.render('login', {
+    res.render('login/login', {
         errors: errors,
         username: username.length > 0 ? username[0] : '' 
     });

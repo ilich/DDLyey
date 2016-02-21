@@ -12,6 +12,7 @@ var configPassport = require('./middleware/passport');
 
 var routes = require('./routes/index');
 var login = require('./routes/login');
+var account = require('./routes/account');
 
 var app = express();
 
@@ -50,6 +51,7 @@ app.use(passport.authenticate('remember-me'));
 
 app.use('/', routes);
 app.use('/login', login);
+app.use('/account', account);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
