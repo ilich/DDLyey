@@ -142,8 +142,8 @@ module.exports = {
         if (query.keywords) {
             if (query.isRegex) {
                 mongoQuery['$or'] = [
-                    {name: new RegExp(query.keywords)},
-                    {text: new RegExp(query.keywords)}
+                    {name: new RegExp(query.keywords, 'i')},
+                    {text: new RegExp(query.keywords, 'i')}
                 ];
             } else {
                 mongoQuery['$text'] = {
