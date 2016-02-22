@@ -1,0 +1,39 @@
+<div class="row">
+    <div class="col-md-offset-2 col-md-8">
+        <h3 class="text-center"><ins>Test Login Credentails</ins></h3>
+        <h4 class="text-center">Username: <strong>demo</strong></h4>
+        <h4 class="text-center">Password: <strong>demo</strong></h4>
+        
+        <h3 class="text-center"><ins>About DDLeye<ins></h3>
+        <p>DDLeye is an application that indexes database metadata and provides powerful search capabilities for those indexes. 
+        The application will be useful for database administrators, database developers or anybody who is responsible 
+        for large database maintenance.</p>
+        <p>The application consists of two parts: database agents and web UI.</p>
+        <p>Database agents are responsible to update the index. They can update the indexes as a batch or in real-time if your database management
+        system supports DDL triggers (e.g. Microsoft SQL Server). I built only MySQL database agent at the moment. It works as a batch, because MySQL 
+        does not support DDL triggers.</p>
+        <p>Web UI allows users to view the indexes and search using full-text search and regular expression capabilities.</p>
+        <p>The web-application also provides REST API to manage the indexes. The API might be used by database agents developers to integrate with
+        DDLeye.</p>
+        
+        <h3 class="text-center"><ins>Technology Stack</ins></h3>
+        <p><ul>
+            <li>Node.js</li>
+            <li>MongoDB (use MongoDB full-text indexes)</li>
+            <li>Bootstrap</li>
+        </ul></p>
+        
+        <h3 class="text-center"><ins>Future Plans</ins></h3>
+        <p>
+            <ul>
+                <li>Add more features to the Web UI, e.g. ability to remove the indexes and manage them from the UI, etc.</li>
+                <li>Use Elasticsearch instead of MongoDB fulltext search to improve search quality.</li>
+                <li>MySQL database agent tuning.</li>
+                <li>Build agents for MS SQL Server, PostgreSQL, MariaDB and Oracle</li>
+                <li>Index constraints and triggers</li>
+                <li>Parse views, stored procedures and functions to build dependency maps</li>
+                <li>Create user documentation</li>
+            </ul>
+        </p> 
+    </div>
+</div>

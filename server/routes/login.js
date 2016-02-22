@@ -15,7 +15,7 @@ router.get('/', function (req, res, next) {
     res.render('login/login', {
         csrfToken: req.csrfToken(),
         errors: errors,
-        username: username.length > 0 ? username[0] : '' 
+        username: username.length > 0 ? username[0] : 'demo' 
     });
 });
 
