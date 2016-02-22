@@ -14,6 +14,25 @@ function validateDatabaseObjectType(type) {
     return type === 'table' || type === 'view' || type === 'procedure' || type === 'function';
 }
 
+function typeId2type(typeId) {
+    switch(typeId) {
+        case '0':
+            return 'table';
+        
+        case '1':
+            return 'view';
+            
+        case '2':
+            return 'procedure';
+            
+        case '3':
+            return 'function';
+            
+        default:
+            return null;
+    }
+}
+
 function validateChecksum(object) {
     if (!object || !object.checksum || !object.text) {
         return false;
@@ -110,6 +129,87 @@ module.exports = {
                     return callback(null, database);
                 }
             });
+        });
+    },
+    
+    search: function (query, callback) {
+        if (!query) {
+            return callback([]);
+        }
+        
+        // Build query
+        var mongoQuery = {};
+        if (query.keywords) {
+            if (query.isRegex) {
+                mongoQuery['$or'] = [
+                    {name: new RegExp(query.keywords)},
+                    {text: new RegExp(query.keywords)}
+                ];
+            } else {
+                mongoQuery['$text'] = {
+                    $search: query.keywords
+                }    
+            }
+            
+        }
+        
+        if (query.database) {
+            try {
+                mongoQuery.database = new ObjectID(query.database);    
+            } catch (err) {
+                // Ignore wrong database IDs
+            }
+        }
+        
+        if (Array.isArray(query.metadata) && query.metadata.length > 0) {
+            var types = []
+            for (var i = 0; i < query.metadata.length; i++) {
+                var type = typeId2type(query.metadata[i]);
+                if (type) {
+                    types.push(type);
+                }
+            }
+            
+            if (types.length > 0) {
+                mongoQuery.type = {
+                    $in: types
+                };
+            }
+        }
+        
+        // Find metedata objects in the database
+        var metadata = db.get().collection('metadata');
+        var aggregateQry = [
+            {
+                $match: mongoQuery
+            },
+            {
+                $lookup: {
+                    from: 'databases',
+                    localField: 'database',
+                    foreignField: '_id',
+                    as: 'databaseInfo'
+                }
+            },
+            {
+                $sort: {
+                    'lastModified': -1,
+                    'databaseInfo.database': 1,
+                    'name': 1
+                }
+            }
+        ];
+        
+        var stream = metadata.aggregate(aggregateQry).stream();
+        
+        var objects = []
+        stream.on('end', function () {
+            return callback(objects);
+        });
+        
+        stream.on('data', function (object) {
+            object.time = strftime('%F %T', object.lastModified);
+            objects.push(object);
         });
     },
     

@@ -17,7 +17,7 @@
     
     <% if (typeof customScripts !== 'undefined' && customScripts && customScripts.length > 0) { %>
         <% for (var i = 0; i < customScripts.length; i++) { %>
-            <script><%= customScripts[i] %></script>
+            <script><%- customScripts[i] %></script>
         <% } %>
     <% } %>
 </body>

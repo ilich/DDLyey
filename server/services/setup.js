@@ -43,7 +43,7 @@ module.exports = {
                         
                         // Create indexes for metadata search
                         var metadata = db.get().collection('metadata');
-                        metadata.createIndex({database: 1, type: 1, name: 1, lastModified: 1}, function (err, result) {
+                        metadata.createIndex({database: 1, type: 1, name: 1}, function (err, result) {
                             if (err) {
                                 return next(err);
                             }

@@ -16,6 +16,7 @@ var api = require('./routes/api');
 var database = require('./routes/database');
 var login = require('./routes/login');
 var account = require('./routes/account');
+var search = require('./routes/search');
 
 var app = express();
 
@@ -63,6 +64,7 @@ app.use(commonData);
 
 app.use('/login', login);
 app.use('/account', account);
+app.use('/search', search);
 app.use('/', database);
 
 // catch 404 and forward to error handler

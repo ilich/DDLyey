@@ -1,0 +1,77 @@
+<% include ../shared/header.ejs %>
+
+<div class="row">
+    <div class="col-md-6">
+        <h3>Search</h3>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+         <form action="/search" method="get" id="search-form">
+            <div class="form-group">
+                <label for="username">Search:</label>
+                <input type="text" name="q" value="<%= query.keywords %>" class="form-control" placeholder="Search" required>
+            </div>
+            <div class="checkbox">
+                <label>
+                    <input type="checkbox" name="r" value="1" <% if (query.isRegex) { %>checked<% } %>> User regular expressions
+                </label>
+            </div>
+            <div class="form-group">
+                <a href="#" id="advanced-search">Show advanced options</a>
+            </div>
+            <div class="form-group advanced-search">
+                <label for="password">Database:</label>
+                <select class="form-control" name="d">
+                    <option value=""></options>
+                    <% for (var i = 0; i < databases.length; i++) { %>
+                        <option value="<%= databases[i]._id %>" <% if (databases[i]._id == query.database) { %>selected<% } %>>
+                            <%= databases[i].database %>
+                        </option>
+                    <% } %>
+                </select>
+            </div>
+            <div class="form-group advanced-search">
+                <label for="password">Database object type:</label>
+                <select multiple class="form-control" name="t">
+                    <option value="0" <% if (query.metadata.indexOf('0') > -1) { %>selected<% } %>>Table</option>
+                    <option value="1" <% if (query.metadata.indexOf('1') > -1) { %>selected<% } %>>View</option>
+                    <option value="2" <% if (query.metadata.indexOf('2') > -1) { %>selected<% } %>>Stored procedure</option>
+                    <option value="3" <% if (query.metadata.indexOf('3') > -1) { %>selected<% } %>>Function</option>
+                </select>
+            </div>
+            <button class="btn btn-default" type="button" id="search-button">Reset</button>
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </form>
+    </div>
+</div>
+
+<% if (query.keywords.length > 0) { %>
+    <% if (results.length == 0) { %>
+        <p class="text-center"><strong>Database objects are not found.</strong></p>
+    <% } else { %>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Database</th>
+                    <th>Object name</th>
+                    <th>Object type</th>
+                    <th>Last modified</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% for (var i = 0; i < results.length; i++) { %>
+                    <tr>
+                        <td><a href="/<%= results[i].database %>"><%= results[i].databaseInfo[0].database %></a></td>
+                        <td><a href="/<%= results[i].database %>/<%= results[i]._id %>"><%= results[i].name %></a></td>
+                        <td><%= results[i].type %></td>
+                        <td><%= results[i].time %></td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    <% } %>
+<% } %>
+
+<% include ../shared/footer.ejs %>
