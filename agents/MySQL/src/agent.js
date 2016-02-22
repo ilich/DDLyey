@@ -91,7 +91,7 @@ MySqlAgent.prototype.sync = function (done) {
                     
                     async.each(result[0], function (mysqlData, callback) {
                         metadata.insert({
-                            database: new ObjectID(self.Id),
+                            database: new ObjectID(self.apiId),
                             type: mongoObjectType,
                             name: mysqlData.OBJECT_NAME,
                             text: mysqlData.TEXT,

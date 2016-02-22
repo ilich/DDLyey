@@ -31,4 +31,94 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel-group" id="metadata" role="tablist" aria-multiselectable="true">
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingTables">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#metadata" href="#collapseTables" aria-expanded="true" aria-controls="collapseTables">
+                            Tables
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseTables" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingTables">
+                    <% if (db.metadata.table && db.metadata.table.length > 0) { %>
+                        <ul>
+                            <% for (var i = 0; i < db.metadata.table.length; i++) { %>
+                                <li><a href="/<%= db._id %>/<%= db.metadata.table[i]._id %>"><%= db.metadata.table[i].name %></a></li>
+                            <% } %>
+                        </ul>
+                    <% } else { %>
+                        <strong>Tables are not found.</strong>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingViews">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#metadata" href="#collapseViews" aria-expanded="true" aria-controls="collapseViews">
+                            Views
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseViews" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingViews">
+                    <% if (db.metadata.view && db.metadata.view.length > 0) { %>
+                        <ul>
+                            <% for (var i = 0; i < db.metadata.view.length; i++) { %>
+                                <li><a href="/<%= db._id %>/<%= db.metadata.view[i]._id %>"><%= db.metadata.view[i].name %></a></li>
+                            <% } %>
+                        </ul>
+                    <% } else { %>
+                        <strong>Views are not found.</strong>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingProcedures">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#metadata" href="#collapseProcedures" aria-expanded="true" aria-controls="collapseProcedures">
+                            Stored Procedures
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseProcedures" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingProcedures">
+                    <% if (db.metadata.procedure && db.metadata.procedure.length > 0) { %>
+                        <ul>
+                            <% for (var i = 0; i < db.metadata.procedure.length; i++) { %>
+                                <li><a href="/<%= db._id %>/<%= db.metadata.procedure[i]._id %>"><%= db.metadata.procedure[i].name %></a></li>
+                            <% } %>
+                        </ul>
+                    <% } else { %>
+                        <strong>Stored procedures are not found.</strong>
+                    <% } %>
+                </div>
+            </div>
+            
+            <div class="panel panel-default">
+                <div class="panel-heading" role="tab" id="headingFunctions">
+                    <h4 class="panel-title">
+                        <a role="button" data-toggle="collapse" data-parent="#metadata" href="#collapseFunctions" aria-expanded="true" aria-controls="collapseFunctions">
+                            Functions
+                        </a>
+                    </h4>
+                </div>
+                <div id="collapseFunctions" class="panel-collapse collapse" role="tabpanel" aria-labelledby="headingFunctions">
+                    <% if (db.metadata.function && db.metadata.function.length > 0) { %>
+                        <ul>
+                            <% for (var i = 0; i < db.metadata.function.length; i++) { %>
+                                <li><a href="/<%= db._id %>/<%= db.metadata.function[i]._id %>"><%= db.metadata.function[i].name %></a></li>
+                            <% } %>
+                        </ul>
+                    <% } else { %>
+                        <strong>Functions are not found.</strong>
+                    <% } %>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <% include ../shared/footer.ejs %>

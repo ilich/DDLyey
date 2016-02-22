@@ -1,5 +1,6 @@
 var protectWeb = require('../middleware/protect-web');
 var databaseService = require('../services/database');
+var async = require('async');
 var express = require('express');
 var router = express.Router();
 
@@ -87,9 +88,25 @@ router.get('/:database', protectWeb, function (req, res, next) {
             return next();
         }
         
-        return res.render('database/view', {
-            db: database,
-            scripts: ['/js/view-database.js']
+        database.metadata = {}
+        async.each(['table', 'view', 'procedure', 'function'], function (type, callback) {
+            databaseService.getObjects(database._id, type, function (err, objects) {
+                if (err || !objects) {
+                    return callback(err);
+                }
+                
+                database.metadata[type] = objects;
+                return callback();
+            });
+        }, function (err, result) {
+            if (err) {
+                return next();
+            } else {
+                return res.render('database/view', {
+                    db: database,
+                    scripts: ['/js/view-database.js']
+                });
+            }
         });
     })
 });
