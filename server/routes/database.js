@@ -111,4 +111,20 @@ router.get('/:database', protectWeb, function (req, res, next) {
     })
 });
 
+router.get('/:database/:metadata', protectWeb, function (req, res, next) {
+    var objectId = req.params.metadata;
+    databaseService.getObjectById(objectId, function (err, object) {
+        if (err || !object) {
+            // Forward request to 404 handler (see app.js)
+            return next();
+        }
+        
+        return res.render('database/metadata', {
+            meta: object,
+            scripts: [ "//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/highlight.min.js" ],
+            customScripts: [ "hljs.initHighlightingOnLoad();" ]
+        });
+    });
+});
+
 module.exports = router;

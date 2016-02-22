@@ -113,6 +113,22 @@ module.exports = {
         });
     },
     
+    getObjectById: function (objectId, callback) {
+        var metadata = db.get().collection('metadata');
+        metadata.findOne(new ObjectID(objectId), function (err, object) {
+            if (err) {
+                return callback(err);
+            }    
+            
+            if (!object) {
+                return callback(null, null);
+            } else {
+                object.time = strftime('%F %T', object.lastModified);
+                return callback(null, object);
+            }
+        });  
+    },
+    
     getObjects: function (databaseId, type, callback) {
         if (typeof type === 'function') {
             callback = type;
